@@ -1,0 +1,35 @@
+# Core Frameworks
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.4
+pydantic-settings>=2.2.1
+
+# Database & Cache
+sqlalchemy>=2.0.28
+psycopg2-binary>=2.9.9
+redis>=5.0.3
+supabase>=2.4.0
+
+# Security & Authentication
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.1.2
+pyjwt>=2.8.0
+
+# HTTP & Environment
+requests>=2.31.0
+python-dotenv>=1.0.1
+python-multipart>=0.0.9
+
+# Scientific & Image Processing
+numpy>=1.26.4
+opencv-python-headless>=4.9.0.80
+pillow>=10.2.0
+
+# AI & LLM Frameworks
+langchain>=0.1.12
+langchain-core>=0.1.30
+langchain-community>=0.0.27
+langchain-openai>=0.0.8
+langchain-google-genai>=0.0.9
+langgraph>=0.0.26
+google-generativeai>=0.4.1
