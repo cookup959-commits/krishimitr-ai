@@ -233,18 +233,38 @@ Response
 ## Commodity Prices
 
 ```http
-GET /market/prices?commodity=tomato
+GET /market/prices?commodity=tomato&latitude=19.9975&longitude=73.7898&radius_km=50
 ```
+
+Query Parameters:
+* `commodity` (required): Name of the crop/commodity.
+* `latitude` (optional): User's current latitude. If omitted, falls back to the user's registered profile location.
+* `longitude` (optional): User's current longitude. If omitted, falls back to the user's registered profile location.
+* `radius_km` (optional, default 50): Search radius for finding closest mandis.
 
 Response
 
 ```json
 {
   "commodity": "Tomato",
+  "user_coords": {
+    "latitude": 19.9975,
+    "longitude": 73.7898
+  },
   "markets": [
     {
-      "name": "Azadpur Mandi",
-      "price": 4200
+      "name": "Pimpalgaon Mandi",
+      "price": 4150,
+      "distance_km": 12.4,
+      "state": "Maharashtra",
+      "district": "Nashik"
+    },
+    {
+      "name": "Nashik Main Mandi",
+      "price": 4200,
+      "distance_km": 15.1,
+      "state": "Maharashtra",
+      "district": "Nashik"
     }
   ]
 }
@@ -255,15 +275,26 @@ Response
 ## Market Comparison
 
 ```http
-GET /market/comparison?commodity=tomato
+GET /market/comparison?commodity=tomato&latitude=19.9975&longitude=73.7898
 ```
 
 Response
 
 ```json
 {
-  "best_market": "Azadpur Mandi",
-  "best_price": 4200
+  "commodity": "Tomato",
+  "best_market": {
+    "name": "Nashik Main Mandi",
+    "price": 4200,
+    "distance_km": 15.1
+  },
+  "alternative_markets": [
+    {
+      "name": "Pimpalgaon Mandi",
+      "price": 4150,
+      "distance_km": 12.4
+    }
+  ]
 }
 ```
 

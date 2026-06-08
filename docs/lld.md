@@ -122,6 +122,8 @@ erDiagram
 - **`id`** (`Integer`, Primary Key)
 - **`commodity`** (`String`, indexed): Commodity name (e.g. Rice, Wheat).
 - **`market_name`** (`String`): Mandi name where the price is tracked.
+- **`latitude`** (`Float`, nullable): Geographic latitude of the mandi.
+- **`longitude`** (`Float`, nullable): Geographic longitude of the mandi.
 - **`price`** (`Float`): Price in INR.
 - **`date`** (`DateTime`)
 
@@ -174,8 +176,11 @@ Schemas are maintained inside `shared/schemas/schemas.py` using Pydantic v2.
 - **`WeatherAlertItem`**: Individual warning item (`type`, `severity`, `description`).
 
 ### 2.5 Market Schemas
-- **`MarketPriceResponse`**: Lists available mandi prices for a given commodity.
-- **`MarketComparisonResponse`**: Aggregates prices and returns the best market name (`best_market`, `best_price`).
+- **`MarketPriceResponse`**: Lists available mandi prices for a commodity sorted by proximity to the user. Includes coordinates and calculated distances.
+  - `commodity`: `str`
+  - `user_coords`: `dict` (containing `latitude` and `longitude`)
+  - `markets`: list of items containing `name`, `price`, `distance_km`, `state`, `district`.
+- **`MarketComparisonResponse`**: Returns the highest-yielding market within the search radius including its name, price, and distance, along with `alternative_markets`.
 
 ---
 
@@ -206,8 +211,9 @@ Each microservice implements standard RESTful endpoints under `/api/v1/...`.
 - `GET /api/v1/weather/alerts` -> Retrieves any regional active weather alert models from the database.
 
 ### 3.5 Market Price Service
-- `GET /api/v1/market/prices` -> Retrieves Mandi prices for a selected commodity.
-- `GET /api/v1/market/compare` -> Resolves highest/lowest mandi rates.
+- `GET /api/v1/market/prices` -> Queries external commodity APIs (e.g., National Agriculture Market / Agmarknet API) to synchronize daily price rates, computes distances from user coordinates using the Haversine formula, and filters/sorts results by proximity.
+- `GET /api/v1/market/compare` -> Compares commodity rates across nearest mandis within a specific geographic radius.
+- `POST /api/v1/market/sync` -> Internal background task trigger to pull data from external Gov/agri endpoints, geocode mandis, and populate the database.
 
 ---
 

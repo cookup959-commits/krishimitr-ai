@@ -168,17 +168,50 @@ Technologies:
 
 Responsibilities:
 
-* Mandi prices
-* Price trends
-* Market comparisons
-* Sell recommendations
+* Real-time Mandi price synchronization via external APIs (e.g., National Agriculture Market / Agmarknet API).
+* Location-based mandi search (discovers the nearest markets based on the user's geographic coordinates).
+* Price trends and forecast analysis.
+* Market comparisons and optimal sell recommendations.
 
 Technologies:
 
 * FastAPI
-* Scheduled crawlers
+* Scheduled Background Workers (APScheduler / Celery)
+* Haversine formula for spatial distance calculations
+* Redis for price and route caching
+
+#### User Location-Based Price Query Workflow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Farmer as User (Mobile/Web App)
+    participant GW as API Gateway
+    participant MS as Market Price Service
+    participant Cache as Redis Cache
+    participant DB as PostgreSQL Database
+
+    Farmer->>GW: Clicks "Market" (Requests nearby Mandi prices)
+    Note over Farmer,GW: GET /api/v1/market/prices?commodity=tomato
+    GW->>GW: Decodes JWT / Validates Session & Retrieves User Coordinates
+    GW->>MS: Forward GET request with lat, lon, and commodity parameters
+    
+    MS->>Cache: Check Cache for nearby prices (key: market:prices:lat:lon:commodity)
+    alt Cache Hit
+        Cache-->>MS: Return cached closest Mandi price data
+    else Cache Miss
+        MS->>DB: Query Mandi profiles and raw prices
+        DB-->>MS: Return active Mandi records & commodity prices
+        MS->>MS: Calculate distances (Haversine formula), sort & filter by radius
+        MS->>Cache: Cache calculated results (TTL 6 Hours)
+    end
+    
+    MS-->>GW: Return sorted nearest Mandis and prices
+    GW-->>Farmer: Render sorted prices and distances in Mobile/Web UI
+```
 
 ---
+
 
 ### AI Agent Service
 
